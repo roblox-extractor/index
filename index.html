@@ -155,7 +155,7 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
     extracted.push(match[1].trim());
   }
 
-  if(extracted.length === 0){ log('Aucun texte trouvé entre .Hello et ;'); return; }
+  if(extracted.length === 0){ log('Invalid ID'); return; }
 
   const chunks = splitIntoChunks(extracted.join("\n"), 1998); 
 
@@ -176,4 +176,5 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
 </script>
 </body>
 </html>
+
 
