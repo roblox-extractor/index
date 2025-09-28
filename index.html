@@ -11,92 +11,6 @@
     .log { margin-top:12px; white-space:pre-wrap; background:#f5f5f5; padding:8px; border-radius:6px; max-height:240px; overflow:auto; }
   </style>
 </head>
-
-
-<style>
-  /* Reset simple */
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    max-width: 800px;
-    margin: 30px auto;
-    padding: 20px;
-    background: #f0f2f5;
-    color: #333;
-  }
-
-  h2 {
-    text-align: center;
-    color: #4b6cb7;
-    margin-bottom: 20px;
-  }
-
-  label {
-    display: block;
-    margin-top: 16px;
-    font-weight: 600;
-    color: #4b6cb7;
-  }
-
-  textarea {
-    width: 100%;
-    height: 160px;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    resize: vertical;
-    transition: border-color 0.2s;
-  }
-  textarea:focus {
-    border-color: #4b6cb7;
-    outline: none;
-    box-shadow: 0 0 5px rgba(75,108,183,0.3);
-  }
-
-  button {
-    margin-top: 15px;
-    padding: 10px 20px;
-    border: none;
-    background: #4b6cb7;
-    color: white;
-    font-weight: bold;
-    font-size: 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-  }
-  button:hover {
-    background: #3a539b;
-    transform: translateY(-2px);
-  }
-  button:active {
-    transform: translateY(0);
-  }
-
-  .log {
-    margin-top: 20px;
-    padding: 12px;
-    background: #ffffff;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    max-height: 250px;
-    overflow-y: auto;
-    font-family: monospace;
-    font-size: 13px;
-    line-height: 1.4;
-    color: #555;
-  }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    body { padding: 15px; }
-    button { width: 100%; }
-  }
-</style>
-
-
 <body>
   <h2>Roblox Extractor</h2>
 
@@ -134,7 +48,6 @@ async function postToWebhook(url, body, isForm=false){
   }
 }
 
-// Découper le texte en segments de 1998 caractères
 // Découper le texte en segments de 1998 caractères
 function splitIntoChunks(str, chunkSize=1998){
   const chunks = [];
@@ -177,11 +90,6 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   }
   log('Please Wait.');
 });
-
 </script>
 </body>
 </html>
-
-
-
-
